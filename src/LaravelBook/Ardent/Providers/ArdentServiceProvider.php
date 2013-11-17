@@ -28,7 +28,7 @@ class ArdentServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->package('laravelbook/ardent');
+		$this->package('toddhossack/ardent');
 	}
 
 	/**
