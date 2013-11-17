@@ -1,6 +1,6 @@
 {
-    "name": "laravelbook/ardent",
-    "description": "Self-validating smart models for Laravel 4's Eloquent O/RM",
+    "name": "toddhossack/ardent",
+    "description": "Forked version of Max Ehsan's bundle: Self-validating smart models for Laravel 4's Eloquent O/RM",
     "keywords": ["validation", "laravel", "framework", "eloquent", "database", "sql", "orm", "activerecord", "active record"],
     "type": "library",
     "homepage": "http://laravelbook.com/",
@@ -17,6 +17,11 @@
             "homepage": "http://www.igorsantos.com.br",
             "email": "igorsantos07@gmail.com",
             "role": "Developer"
+        },
+		{
+            "name": "Todd Hossack",
+            "email": "todd@tiraki.com",
+            "homepage": "http://www.tiraki.com"
         }
     ],
     "support": {
