@@ -24,7 +24,7 @@ use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Symfony\Component\Translation\Loader\PhpFileLoader;
 use Symfony\Component\Translation\Translator;
-
+use LaravelBook\Ardent\Relations\BelongsToMany;
 /**
  * Ardent - Self-validating Eloquent model base class
  *
@@ -493,7 +493,7 @@ abstract class Ardent extends Model {
 
         // Merge in overriding rules
 		$rules = array_merge(static::$rules,$rules);
-  
+
         foreach ($rules as $field => $rls) {
             if ($rls == '') {
                 unset($rules[$field]);
@@ -561,13 +561,15 @@ abstract class Ardent extends Model {
         Closure $afterSave = null,
         $force = false
     ) {
+		
         if ($beforeSave) {
             self::saving($beforeSave);
         }
         if ($afterSave) {
             self::saved($afterSave);
         }
-
+		
+		
         $valid = $this->validate($rules, $customMessages);
 
         if ($force || $valid) {
@@ -688,7 +690,7 @@ abstract class Ardent extends Model {
      * @return bool
      */
     protected function performSave(array $options) {
-
+		
         if ($this->autoPurgeRedundantAttributes) {
             $this->attributes = $this->purgeArray($this->getAttributes());
         }
@@ -842,5 +844,44 @@ abstract class Ardent extends Model {
 		}
 
 		return $builder;
+	}
+	
+	
+	/**
+	 * Define a many-to-many relationship.
+	 *
+	 * @param  string  $related
+	 * @param  string  $table
+	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null)
+	{
+		$caller = $this->getBelongsToManyCaller();
+
+		// First, we'll need to determine the foreign key and "other key" for the
+		// relationship. Once we have determined the keys we'll make the query
+		// instances as well as the relationship instances we need for this.
+		$foreignKey = $foreignKey ?: $this->getForeignKey();
+
+		$instance = new $related;
+
+		$otherKey = $otherKey ?: $instance->getForeignKey();
+
+		// If no table name was provided, we can guess it by concatenating the two
+		// models using underscores in alphabetical order. The two model names
+		// are transformed to snake case from their default CamelCase also.
+		if (is_null($table))
+		{
+			$table = $this->joiningTable($related);
+		}
+
+		// Now we're ready to create a new query builder for the related model and
+		// the relationship instances for the relation. The relations will set
+		// appropriate query constraint and entirely manages the hydrations.
+		$query = $instance->newQuery();
+
+		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $caller['function']);
 	}
 }
