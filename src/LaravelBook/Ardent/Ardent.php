@@ -491,8 +491,8 @@ abstract class Ardent extends Model {
             }
         }
 
-        // Merge in overriding rules
-		$rules = array_merge(static::$rules,$rules);
+        // Merge in overriding rules - mod for belongsToMany
+		$rules = $this->dynamicRules(array_merge(static::$rules,$rules));
 
         foreach ($rules as $field => $rls) {
             if ($rls == '') {
@@ -508,9 +508,9 @@ abstract class Ardent extends Model {
 			if ($this->forceEntityHydrationFromInput || (empty($this->attributes) && $this->autoHydrateEntityFromInput)) {
 				$this->fill(Input::all());
 			}
-
+		
 			$data = $this->getAttributes(); // the data under validation
-
+			
 			// perform validation
 			$validator = self::makeValidator($data, $rules, $customMessages);
 			$success   = $validator->passes();
@@ -781,7 +781,13 @@ abstract class Ardent extends Model {
 
         return $rules;
     }
-
+	/**
+	 * Override in subclasses to modify rules dynamically
+	 * @return array
+	 */
+	protected function dynamicRules($rules) {
+		return (array) $rules;
+	}
     /**
      * Update a model, but filter uniques first to ensure a unique validation rule
      * does not fire
@@ -800,7 +806,7 @@ abstract class Ardent extends Model {
         Closure $afterSave = null
     ) {
         $rules = $this->buildUniqueExclusionRules($rules);
-        
+
         return $this->save($rules, $customMessages, $options, $beforeSave, $afterSave);
     }
 
