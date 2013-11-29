@@ -25,6 +25,9 @@ use Illuminate\Validation\Factory as ValidationFactory;
 use Symfony\Component\Translation\Loader\PhpFileLoader;
 use Symfony\Component\Translation\Translator;
 use LaravelBook\Ardent\Relations\BelongsToMany;
+use LaravelBook\Ardent\Relations\MorphOne;
+use LaravelBook\Ardent\Relations\MorphMany;
+
 /**
  * Ardent - Self-validating Eloquent model base class
  *
@@ -561,7 +564,7 @@ abstract class Ardent extends Model {
         Closure $afterSave = null,
         $force = false
     ) {
-		
+
         if ($beforeSave) {
             self::saving($beforeSave);
         }
@@ -890,4 +893,5 @@ abstract class Ardent extends Model {
 
 		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $caller['function']);
 	}
+	
 }
