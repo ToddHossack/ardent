@@ -411,7 +411,9 @@ abstract class Ardent extends Model {
 
 		$class = $this->$type;
 
-		return $this->belongsTo($class, $id);
+		$relation = $this->belongsTo($class, $id);
+		$relation->polymorph = array('type' => $type, 'id' => $id);
+		return $relation;
 	}
 
     /**
@@ -533,7 +535,7 @@ abstract class Ardent extends Model {
 				$this->validationErrors = $validator->messages();
 
 				// stash the input to the current session
-				if (!self::$externalValidator && Input::hasSessionStore()) {
+				if (!self::$externalValidator && Input::hasSession()) {
 					Input::flash();
 				}
 			}
