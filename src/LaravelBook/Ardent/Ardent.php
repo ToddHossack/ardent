@@ -493,6 +493,7 @@ abstract class Ardent extends Model {
      * @throws InvalidModelException
      */
     public function validate(array $rules = array(), array $customMessages = array()) {
+		
         if ($this->fireModelEvent('validating') === false) {
             if ($this->throwOnValidation) {
                 throw new InvalidModelException($this);
@@ -509,7 +510,7 @@ abstract class Ardent extends Model {
                 unset($rules[$field]);
             }
         }
-
+		
         if (empty($rules)) {
             $success = true;
         } else {
@@ -587,6 +588,30 @@ abstract class Ardent extends Model {
         }
     }
 
+	public function restore() {
+		if ($this->softDelete)
+		{
+			// If the restoring event does not return false, we will proceed with this
+			// restore operation. Otherwise, we bail out so the developer will stop
+			// the restore totally. We will clear the deleted timestamp and save.
+			if ($this->fireModelEvent('restoring') === false)
+			{
+				return false;
+			}
+
+			$this->{static::DELETED_AT} = null;
+
+			// Once we have saved the model, we will fire the "restored" event so this
+			// developer will do anything they need to after a restore operation is
+			// totally finished. Then we will return the result of the save call.
+			$result = $this->forceSave();
+
+			$this->fireModelEvent('restored', false);
+
+			return $result;
+		}
+	}
+	
     /**
      * Save the model to the database.
      *
